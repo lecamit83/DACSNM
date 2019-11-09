@@ -34,6 +34,7 @@ void childProcessing(int* fds) {
   read(*(fds + PIPE_READER_CODE), pipeDataInput, INPUT_LENGTH);
   // printf("%s", pipeDataInput);
   double rs = calculate(pipeDataInput);
+  printf("\n");
   // printf("%lf", rs);
   write(*(fds + PIPE_WRITER_CODE), pipeDataInput, INPUT_LENGTH);
   

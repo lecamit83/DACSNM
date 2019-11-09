@@ -2,7 +2,7 @@
 #define _utils_h_
 
 #include <ctype.h>
-char operators[13][7] = {"+", "-", "*", "/", "(", ")", "~", "sin", "cos", "tan", "arcsin", "sqrt", "log"};
+char operators[13][7] = {"+", "-", "*", "/", "(", ")", "~", "sin", "cos", "tan", "sqrt", "log"};
 
 char * readFile(const char * filename) {
   const int MAX_LENGTH = 63;
@@ -73,17 +73,34 @@ char** split(char * math, const char * c) {
 
   
   result = malloc((counter + 1)*sizeof(char *));
-  
-  counter = 0;
-  
+  int index = 0;
   char* ptr = strtok(str, c);
 	while (ptr != NULL)
 	{
-    // strcat(result[counter++], ptr);
-    printf("\n%s\n", ptr);
+    result[index++] = strdup(ptr);
 		ptr = strtok(NULL, c);
 	}
   return result;
 }
+
+int length (char ** math) {
+  int count = 0;
+  while (*(math + count++));
+  return count - 1;
+}
+
+int getPriority (char* operator) {
+  if(
+      !strcmp(operator, "cos") 
+    || !strcmp(operator, "sin") 
+    || !strcmp(operator, "tan") 
+    || !strcmp(operator, "sqrt") 
+    || !strcmp(operator, "log")) return 4;
+  if(!strcmp(operator, "(") || !strcmp(operator, ")")) return 1;
+  if(!strcmp(operator, "+") || !strcmp(operator, "-")) return 2;
+  if(!strcmp(operator, "*") || !strcmp(operator, "/")) return 3;
+  return 0;
+}
+// char operators[13][7] = {"+", "-", "*", "/", "(", ")", "~", "sin", "cos", "tan", "arcsin", "sqrt", "log"};
 
 #endif
