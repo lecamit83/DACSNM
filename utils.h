@@ -101,6 +101,18 @@ int getPriority (char* operator) {
   if(!strcmp(operator, "*") || !strcmp(operator, "/")) return 3;
   return 0;
 }
+
+int getOperands(char* operator) {
+  if(
+      !strcmp(operator, "cos") 
+    || !strcmp(operator, "sin") 
+    || !strcmp(operator, "tan") 
+    || !strcmp(operator, "sqrt") 
+    || !strcmp(operator, "log")) return 1;
+  return 2;
+}
+
+
 // char operators[13][7] = {"+", "-", "*", "/", "(", ")", "~", "sin", "cos", "tan", "arcsin", "sqrt", "log"};
 
 #endif

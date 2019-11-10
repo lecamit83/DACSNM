@@ -1,10 +1,12 @@
 #ifndef _balan_h_
 #define _balan_h_
-#include "stack.h"
+#include "operatorstack.h"
+#include "numberstack.h"
+#include <math.h>
 
 const int MAX_LENGTH = 63;
 const int MAX_LENGTH_OPERATOR = 7;
-const double M_PI = 3.14;
+const double MATH_PI = 3.14159265358979323846;
 const int TRUE = 1;
 const int FALSE = 0;
 
@@ -50,38 +52,28 @@ char* formatRegex(char* mathRegex) {
   return result;
 }
 
-// double doCalc(char* operator, char* a) {
-//   /*
-//   Apply for cos, sin, tan,. ...
-//   */
-//   if(operator == "cos") {
-
-//   }
-//   if(operator == "sin") {
-
-//   }
-//   if(operator == "tan") {
-
-//   }
-//   return 0.0;
-// }
-double doCalc(char* operator, char* a, char* b) {
-  /*
-  +, -, *, /, ...
-  */
+double doCalc(char* operator, double numberOne,  double numberTwo) {
   if(strcmp(operator,"*") == 0) {
-
+    return numberOne * numberTwo;
   } 
   if(strcmp(operator,"/") == 0) {
-
+    return numberOne / numberTwo;
   } 
   if(strcmp(operator,"-") == 0) {
-
+    return numberOne - numberTwo;
   } 
   if(strcmp(operator,"+") == 0) {
-
+    return numberOne + numberTwo;
   }
-  return 0.0;
+}
+
+double doCalcOneOperand(char* operator, double a) {
+  double val = MATH_PI * a / 180; 
+  if(!strcmp(operator, "cos")) return cos(val);
+  if(!strcmp(operator, "sin")) return sin(val);
+  if(!strcmp(operator, "tan")) return tan(val);
+  if(!strcmp(operator, "sqrt")) return sqrt(a);
+  if(!strcmp(operator, "log")) return log10(a);
 }
 
 char** infixToPostfix(char * formatMath) {
@@ -89,7 +81,7 @@ char** infixToPostfix(char * formatMath) {
   const int len = length(math);
   char ** postfix = malloc (len * sizeof(char*));
   int index = 0;
-  struct stack* s = create();
+  struct OperatorStack* s = create();
   for(int i = 0; i < len; i++) {
     if(isOperator(*(math + i))) { 
       if (strcmp(*(math + i), "(") == 0) {
@@ -112,22 +104,43 @@ char** infixToPostfix(char * formatMath) {
   }
   free(s);
   postfix[index] = NULL;
+  // for(size_t i = 0; i < index; i++) {
+  //   printf("%s ", postfix[i]);
+  // }
+  // printf("\n");
   return postfix;
 }
 
-void calc(char** postfix) {
+double calc(char** postfix) {
   const int len = length(postfix);
-  struct stack* s = create();
-  for(int i = len - 1; i >= 0; i--) { push(&s, *(postfix + i)); }
-  printStack(s);
+  struct NumberStack* numberStack = createNumberStack();
+  for(size_t i = 0; i < len; i++) { 
+    if(!isOperator(*(postfix + i))) { 
+      double atofNumber = atof(*(postfix + i));
+      pushNumberStack(&numberStack, atofNumber); 
+    } else {
+      if(getOperands(*(postfix + i)) == 2) {
+        double a = popNumberStack(&numberStack);
+        double b = popNumberStack(&numberStack);
+        double value = doCalc(*(postfix + i), b, a);
+        pushNumberStack(&numberStack, value);
+      } else {
+        double a = popNumberStack(&numberStack);
+        double value = doCalcOneOperand(*(postfix + i), a);
+        pushNumberStack(&numberStack, value);
+      }
+      
+    }
+  }
+  return popNumberStack(&numberStack);
 }
 
 double calculate(char * mathRegex) {
   char * trimMath = trimRegex(mathRegex);
   char * formatMath = formatRegex(trimMath);
   char ** postfixString = infixToPostfix(formatMath);
-  calc(postfixString);
-  return 0.0;
+  double result = calc(postfixString);
+  return result;
 }
 
 
